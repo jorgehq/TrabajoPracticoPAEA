@@ -45,6 +45,7 @@ public class sesionDao
 	@Autowired
 	private funcionesSQL f;
 	
+	//Funcion insert permite iniciar una nueva sesion si la sesion ya existe no se crea de nuevo.
 	public void insert(sesion s) {
 		if(f.existsById(s.getId())){
 			LOG.info("Sesion ya existe");
@@ -52,11 +53,13 @@ public class sesionDao
 			em.persist(s);	
 		}
 	}
+	//Funcion que permite mostrar todos las sesiones guardadas en la tabla sql
 	public void mostrar() {
 		
 		System.out.println(f.findAll().toString());
 		
 	}
+	//Funcion pedida que permite persistir cualquier objeto en una sesion relacionada  con la id 
 	public void store(int id,Object o) {
 		sesion s=f.findById(id).get();
 		ObjectMapper om=new ObjectMapper();
