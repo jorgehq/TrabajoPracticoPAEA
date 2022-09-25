@@ -22,6 +22,10 @@ import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuer
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import pablosz.app.Implement.funcionesSQL;
 
 /*
@@ -33,6 +37,8 @@ import pablosz.app.Implement.funcionesSQL;
 @Component
 public class sesionDao
 {
+	listener lis=new listener();
+
 	private static Logger LOG = LoggerFactory.getLogger(Application.class);
 	@Autowired
 	private EntityManager em;
@@ -53,10 +59,52 @@ public class sesionDao
 	}
 	public void store(int id,Object o) {
 		sesion s=f.findById(id).get();
-		s.setObj(o.toString());
+		ObjectMapper om=new ObjectMapper();
+		try
+		{
+			s.setObj(om.writeValueAsString(o));
+		}
+		catch(JsonProcessingException e)
+		{
+			e.printStackTrace();
+		}
+		
 		em.persist(s);
 
 	}
+	public <T> Object load(int id,Class<T> cl) {
+		ObjectMapper om=new ObjectMapper();
+		sesion s=f.findById(id).get();
+		Object ob= new Object();
+		try
+		{
+			
+			ob=om.readValue(s.getObj(),cl);
+			
+			
+		}
+		catch(JsonMappingException e)
+		{
+			
+			e.printStackTrace();
+		}
+		catch(JsonProcessingException e)
+		{
+			e.printStackTrace();
+		}
+		return ob;
+		
+	}
+	public <T> Object remove(int id,Class<T> cl) {
+		Object r=this.load(id,cl);
+		this.store(id,"");
+		return r;
+		
+	}
+	public void destroySesion(int id) {
+		f.deleteById(id);
+		LOG.info("Sesion "+id+" eliminada");
+	}
 	
-
 }
+

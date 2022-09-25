@@ -47,14 +47,16 @@ public class Application implements CommandLineRunner
 	public void run(String... args) throws Exception
 	{
 		LOG.info("Todo funciona correctamente? "+(em!=null));
-	//	sesion n=new sesion(3,80);
-		//d.insert(n);
+		
+		sesion n=new sesion(3,80);
+		d.insert(n);
+		
 		persona p=new persona("Tomas","Perez",3);
 		d.store(3,p);
 		d.mostrar();
-		
-		
-		
+		d.load(3,persona.class);
+		d.remove(3,persona.class);
+		d.mostrar();
 		
 	}
 		
