@@ -53,9 +53,13 @@ public class Application implements CommandLineRunner
 		
 		persona p=new persona("Tomas","Perez",3);
 		d.store(3,p);
+		
 		d.mostrar();
+		
 		d.load(3,persona.class);
+		
 		d.remove(3,persona.class);
+		
 		d.mostrar();
 		
 	}

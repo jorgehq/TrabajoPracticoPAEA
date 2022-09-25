@@ -40,6 +40,7 @@ public class sesion
 	@Override
 	public String toString()
 	{
+		
 		return "sesion [id="+id+", tlimite="+tlimite+", obj="+obj+"]";
 	}
 

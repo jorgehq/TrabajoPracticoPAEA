@@ -10,11 +10,13 @@ public class listener
 	public void sesionClosed(int id) {
 		
 		System.out.println("Se cierra la sesion "+id);
+		
 		this.sesionStillClosed(id);
 		
 	}
 	
 	public void sesionStillClosed(int id){
+		
 		
 				System.out.println("Sesion "+id+" sigue cerrada");
 			

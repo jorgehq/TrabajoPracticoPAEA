@@ -100,7 +100,9 @@ public class sesionDao
 	}
 	public <T> Object remove(int id,Class<T> cl) {
 		Object r=this.load(id,cl);
+		
 		this.store(id,"");
+		
 		return r;
 		
 	}
