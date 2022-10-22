@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 
 // +---------------------------------------------------------+
@@ -25,8 +27,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @Transactional
+@EnableAsync
 public class Application implements CommandLineRunner
 {
+	/*
+	public TaskExecutor getAsyncExcutor() {
+		
+	}
+	*/
     private static Logger LOG = LoggerFactory.getLogger(Application.class);
 
     @Autowired
@@ -35,6 +43,7 @@ public class Application implements CommandLineRunner
     private EntityManager em;
     
     
+
 	public static void main(String[] args)
 	{
 		SpringApplication.run(Application.class,args);
@@ -47,20 +56,27 @@ public class Application implements CommandLineRunner
 	public void run(String... args) throws Exception
 	{
 		LOG.info("Todo funciona correctamente? "+(em!=null));
-		
+		listener ls=new listener();
 		sesion n=new sesion(3,80);
+		ls.agregarALista(new sessionlistener(n.getId(),n.getTlimite(),n.getLast()));
+		ls.runListener();
+		System.out.println(n.toString());
+		
+		
 		d.insert(n);
 		
 		persona p=new persona("Tomas","Perez",3);
 		d.store(3,p);
 		
-		d.mostrar();
+		d.mostrarTodasSesiones();
 		
 		d.load(3,persona.class);
 		
 		d.remove(3,persona.class);
 		
-		d.mostrar();
+		d.mostrarTodasSesiones();
+		d.destroySesion(3);
+		d.mostrarTodasSesiones();
 		
 	}
 		

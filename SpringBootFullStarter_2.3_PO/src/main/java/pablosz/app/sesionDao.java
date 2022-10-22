@@ -35,33 +35,47 @@ import pablosz.app.Implement.funcionesSQL;
  
  * */
 @Component
-public class sesionDao
+public class sesionDao 
 {
 	listener lis=new listener();
 
 	private static Logger LOG = LoggerFactory.getLogger(Application.class);
 	@Autowired
 	private EntityManager em;
-	@Autowired
-	private funcionesSQL f;
+	
+	
+
+	
+	public void mostrarTodasSesiones() {
+		String hql="from sesion s";
+		Query q=em.createQuery(hql);
+		
+		System.out.println(q.getResultList().toString());
+	}
+	public sesion buscarID(int id) {
+		String hql="from sesion s where id="+id;
+		Query q=em.createQuery(hql);
+		sesion s=(sesion)q.getSingleResult();
+		return s;
+	}
+	public void eliminarID(int id) {
+		String hql="delete from sesion s where id="+id;
+		Query q=em.createQuery(hql);
+		q.executeUpdate();
+		
+	}
+	
 	
 	//Funcion insert permite iniciar una nueva sesion si la sesion ya existe no se crea de nuevo.
 	public void insert(sesion s) {
-		if(f.existsById(s.getId())){
-			LOG.info("Sesion ya existe");
-		}else {
+
 			em.persist(s);	
-		}
-	}
-	//Funcion que permite mostrar todos las sesiones guardadas en la tabla sql
-	public void mostrar() {
-		
-		System.out.println(f.findAll().toString());
 		
 	}
+
 	//Funcion pedida que permite persistir cualquier objeto en una sesion relacionada  con la id 
 	public void store(int id,Object o) {
-		sesion s=f.findById(id).get();
+		sesion s=this.buscarID(id);
 		ObjectMapper om=new ObjectMapper();
 		try
 		{
@@ -77,7 +91,7 @@ public class sesionDao
 	}
 	public <T> Object load(int id,Class<T> cl) {
 		ObjectMapper om=new ObjectMapper();
-		sesion s=f.findById(id).get();
+		sesion s=this.buscarID(id);
 		Object ob= new Object();
 		try
 		{
@@ -106,10 +120,26 @@ public class sesionDao
 		return r;
 		
 	}
+	
 	public void destroySesion(int id) {
-		f.deleteById(id);
+		
+		this.eliminarID(id);
 		LOG.info("Sesion "+id+" eliminada");
 	}
 	
+	
+	/*
+	 List <listener> lista=
+	 while(true){
+	 	try{
+	 		for(int i=0;i<listaListener.length;i++){
+	 			
+	 		}
+	 		sleep(10000)
+	 	}
+	 }
+	 * */
+	
 }
+
 

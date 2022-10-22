@@ -23,6 +23,8 @@ public class sesion
 	private int tlimite;
 	@Column(name="obj")
 	private String obj;
+	@Column(name="lastA")
+	private int lastA;
 
 	
 	public sesion() {};
@@ -32,16 +34,28 @@ public class sesion
 		setId(id);
 		setTlimite( tlimite);
 		setObj("");
+		setLast((int)System.currentTimeMillis());
 	
 	}
 	
 	
 
+	
+
 	@Override
 	public String toString()
 	{
-		
-		return "sesion [id="+id+", tlimite="+tlimite+", obj="+obj+"]";
+		return "sesion [id="+id+", tlimite="+tlimite+", obj="+obj+", lastA="+lastA+"]";
+	}
+
+	public int getLast()
+	{
+		return lastA;
+	}
+
+	public void setLast(int last)
+	{
+		this.lastA=last;
 	}
 
 	public String getObj()
