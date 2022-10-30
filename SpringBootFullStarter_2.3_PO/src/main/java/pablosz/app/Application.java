@@ -15,6 +15,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
+import pablosz.test.MiClase1;
+
 
 // +---------------------------------------------------------+
 // | NOTA: Si queremos organizar los componentes y entidades | 
@@ -38,7 +45,7 @@ public class Application implements CommandLineRunner
     private static Logger LOG = LoggerFactory.getLogger(Application.class);
 
     @Autowired
-	private sesionDao d;
+	private PersistentObject po;
     @Autowired
     private EntityManager em;
     
@@ -56,29 +63,40 @@ public class Application implements CommandLineRunner
 	public void run(String... args) throws Exception
 	{
 		LOG.info("Todo funciona correctamente? "+(em!=null));
-		listener ls=new listener();
-		sesion n=new sesion(3,80);
-		ls.agregarALista(new sessionlistener(n.getId(),n.getTlimite(),n.getLast()));
-		ls.runListener();
-		System.out.println(n.toString());
+
+
+		po.destroySession(7);
+		po.createSession(7,80);
+		po.mostrarTodasSesiones();
 		
+		int number=5;
+		String nom="pablo";
+		MiClase1 mc1 = new MiClase1(1,2,3);
+		mc1.setAttPersistable("x");
+		mc1.setAttNoPersistable("y");
+		po.store(7,number);
+		po.store(7,nom);
+		po.store(7,mc1);
+		MiClase1 mc2=(MiClase1)po.load(7,MiClase1.class);
+
 		
-		d.insert(n);
+		po.mostrarTodasSesiones();
+		po.remove(7,String.class);
 		
-		persona p=new persona("Tomas","Perez",3);
-		d.store(3,p);
+		po.mostrarTodasSesiones();
 		
-		d.mostrarTodasSesiones();
+		/*
+		persona pe=(persona)po.load(7,persona.class);
+		System.out.println(pe.toString());
 		
-		d.load(3,persona.class);
+		po.remove(7,persona.class);
 		
-		d.remove(3,persona.class);
-		
-		d.mostrarTodasSesiones();
-		d.destroySesion(3);
-		d.mostrarTodasSesiones();
+		po.mostrarTodasSesiones();
+		po.destroySession(7);
+		po.mostrarTodasSesiones();
+		*/
 		
 	}
 		
+	}
 
-}

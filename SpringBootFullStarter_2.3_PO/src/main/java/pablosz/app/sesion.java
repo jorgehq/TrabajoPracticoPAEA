@@ -18,7 +18,7 @@ public class sesion
 {
 	@Id
 	@Column(name="id")
-	private int id;
+	private long id;
 	@Column(name="tlimite")
 	private int tlimite;
 	@Column(name="obj")
@@ -29,7 +29,7 @@ public class sesion
 	
 	public sesion() {};
 	
-	public sesion(int id,int tlimite)
+	public sesion(long id,int tlimite)
 	{
 		setId(id);
 		setTlimite( tlimite);
@@ -68,11 +68,11 @@ public class sesion
 		this.obj=obj;
 	}
 
-	public int getId()
+	public long getId()
 	{
 		return id;
 	}
-	public void setId(int id)
+	public void setId(long id)
 	{
 		this.id=id;
 	}
