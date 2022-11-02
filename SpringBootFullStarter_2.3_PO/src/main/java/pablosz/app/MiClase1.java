@@ -1,24 +1,36 @@
-package pablosz.test;
+package pablosz.app;
 
-import pablosz.ann.NotPersistable;
+
+
 import pablosz.ann.Persistable;
+import pablosz.ann.NotPersistable;
 
 @Persistable
-
 public class MiClase1 extends MiClase1Base
 {
+	
+	
+
 	private int att1;
+	
+	
+
 	private int att2;
+	
+	
+
 	private int att3;
+	
 	
 	@NotPersistable
 	private Integer att4;
 	
 	public MiClase1() {
-		
 	}
+	
 	public MiClase1(int a,int b,int c)
 	{
+		super();
 		att1=a;
 		att2=b;
 		att3=c;
@@ -53,10 +65,14 @@ public class MiClase1 extends MiClase1Base
 	{
 		return att4;
 	}
+
 	@Override
 	public String toString()
 	{
-		return "MiClase1 [att1="+att1+", att2="+att2+", att3="+att3+", att4="+att4+"]";
+		return "MiClase1 [att1="+att1+", att2="+att2+", att3="+att3+", att4="+att4+", Clase1Base="+super.toString()+"]";
 	}
+	
+
+
 	
 }

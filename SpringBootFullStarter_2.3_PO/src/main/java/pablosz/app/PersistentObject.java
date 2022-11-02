@@ -4,11 +4,13 @@ package pablosz.app;
 
 import static org.mockito.ArgumentMatchers.anyList;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -16,6 +18,7 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.assertj.core.util.Arrays;
+import org.hibernate.mapping.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
+import pablosz.ann.NotPersistable;
+
 
 
 
@@ -48,31 +53,7 @@ public class PersistentObject
 	
 
 	
-	public void mostrarTodasSesiones() {
-		String hql="from sesion s";
-		Query q=em.createQuery(hql);
-		
-		System.out.println(q.getResultList().toString());
-	}
-	public sesion buscarID(long id) {
-		String hql="from sesion s where id="+id;
-		Query q=em.createQuery(hql);
-		
-		try {
-			sesion s=(sesion)q.getSingleResult();
-			return s;
-		}catch(NoResultException e) {
-			
-			return null;
-		}
-		
-	}
-	public void eliminarID(long id) {
-		String hql="delete from sesion s where id="+id;
-		Query q=em.createQuery(hql);
-		q.executeUpdate();
-		
-	}
+	
 	
 	
 	//Funcion insert permite iniciar una nueva sesion si la sesion ya existe no se crea de nuevo.
@@ -81,6 +62,78 @@ public class PersistentObject
 			em.persist(new sesion(key,i));	
 		
 	}
+	
+
+	//Funcion pedida que permite persistir cualquier objeto en una sesion relacionada  con la id 
+	public void store(long id,Object o) {
+		sesion s=this.buscarID(id);
+		ObjectMapper om=new ObjectMapper();
+		notPersistableRemove(o,o.getClass());
+
+		try
+		{
+			String json=om.writeValueAsString(o);
+			if(s.getObj()=="") {
+				s.setObj(json);
+			}else {
+				s.setObj(s.getObj()+";"+json);
+			}
+			
+		}
+		catch(JsonProcessingException e)
+		{
+			e.printStackTrace();
+		}
+		
+		em.persist(s);
+
+	}
+	public Boolean esString(String objeto) {
+		if(objeto.charAt(0)=='"') {
+			return true;
+		}
+		return false;
+		
+		
+	}
+	
+	public <T> Object load(long id,Class<T> cl) {
+		sesion s=this.buscarID(id);
+		Object ob= new Object();
+		
+			if(s==null) {
+				return null;
+				
+			}else {
+				ob=this.comprobarInstancias(cl,s.getObj());
+			}
+			s.setLast((int)System.currentTimeMillis());
+			em.persist(s);
+		return ob;
+		
+	}
+	public <T> Object remove(long id,Class<T> cl) {
+		Object r=this.load(id,cl);
+		sesion s=buscarID(id);
+		s.setObj(removerInstancia(cl,s.getObj()));
+		s.setLast((int)System.currentTimeMillis());
+		em.persist(s);
+		return r;
+		
+	}
+	
+	public void destroySession(long id) {
+		
+		this.eliminarID(id);
+		LOG.info("Sesion "+id+" eliminada");
+	}
+	
+	
+/*
+ * Funciones que Su funcionalidad es recorrer la lista definida en busca de una determinada clase dada por parametro
+ * Una vez encontrada se realizara la accion definida por el metodo.
+ * */
+	
 	public <T>Object comprobarInstancias(Class<T> cl,String objetos){
 		String[] instancias=objetos.split(";");
 		System.out.println("Buscando instancia de clase en la lista");
@@ -182,82 +235,86 @@ public class PersistentObject
 		
 		
 	}
+	//===================================Funciones Complementarias=======================================
+	
+	public void mostrarTodasSesiones() {
+		String hql="from sesion s";
+		Query q=em.createQuery(hql);
+		
+		System.out.println(q.getResultList().toString());
+	}
+	
+	public sesion buscarID(long id) {
+		String hql="from sesion s where id="+id;
+		Query q=em.createQuery(hql);
+		
+		try {
+			sesion s=(sesion)q.getSingleResult();
+			return s;
+		}catch(NoResultException e) {
+			
+			return null;
+		}
+		
+	}
+	public void eliminarID(long id) {
+		String hql="delete from sesion s where id="+id;
+		Query q=em.createQuery(hql);
+		q.executeUpdate();
+		
+	}
+	
+	//Metodo que devuelve todos los campos de una clase incluyendo las subclaces. ESto se logra mediante la recursividad usando superClass
+	public   List<Field> getAllFields(Class<?> type) {
 
-	//Funcion pedida que permite persistir cualquier objeto en una sesion relacionada  con la id 
-	public void store(long id,Object o) {
-		sesion s=this.buscarID(id);
-		ObjectMapper om=new ObjectMapper();
-
-		try
-		{
-			String json=om.writeValueAsString(o);
-			if(s.getObj()=="") {
-				s.setObj(json);
+		  List<Field> fields = new ArrayList<Field>();
+	        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+	        	for(Field a:(c.getDeclaredFields())){
+	        		fields.add(a);
+	        	}
+	        }
+	        return fields;
+       
+    }
+	
+	//Metodo que controla que el objeto no tenga variables no persistable seteandolos en null cuando se encuentre
+    public  void notPersistableRemove (Object modificado,Class<?> obj) {
+    	List<Field> campos=getAllFields(obj);
+		
+	    for(Field f:campos) {
+		
+			if(f.isAnnotationPresent(NotPersistable.class)) {
+				//Permite que se pueda modificarla variable
+				f.setAccessible(true);
+				
+				try
+				{
+					//Modificacion de la variable
+					f.set(modificado,null);
+				}
+				catch(IllegalArgumentException e)
+				{
+					
+					e.printStackTrace();
+				}
+				catch(IllegalAccessException e)
+				{
+					
+					e.printStackTrace();
+				}
+				
+				System.out.println("No peristable");
 			}else {
-				s.setObj(s.getObj()+";"+json);
+				
+				
+				System.out.println("Persistable");
 			}
 			
 		}
-		catch(JsonProcessingException e)
-		{
-			e.printStackTrace();
-		}
+	    
+	   
+    }
 		
-		em.persist(s);
-
-	}
-	public Boolean esString(String objeto) {
-		if(objeto.charAt(0)=='"') {
-			return true;
-		}
-		return false;
-		
-		
-	}
-	
-	public <T> Object load(long id,Class<T> cl) {
-		sesion s=this.buscarID(id);
-		Object ob= new Object();
-		
-			if(s==null) {
-				return null;
-				
-			}else {
-				ob=this.comprobarInstancias(cl,s.getObj());
-			}
-			s.setLast((int)System.currentTimeMillis());
-			em.persist(s);
-		return ob;
-		
-	}
-	public <T> Object remove(long id,Class<T> cl) {
-		Object r=this.load(id,cl);
-		sesion s=buscarID(id);
-		s.setObj(removerInstancia(cl,s.getObj()));
-		s.setLast((int)System.currentTimeMillis());
-		em.persist(s);
-		return r;
-		
-	}
-	
-	public void destroySession(long id) {
-		
-		this.eliminarID(id);
-		LOG.info("Sesion "+id+" eliminada");
-	}
-	
-	
-	/*
-	 List <listener> lista=
-	 while(true){
-	 	try{
-	 		for(int i=0;i<listaListener.length;i++){
-	 			
-	 		}
-	 		sleep(10000)
-	 	}
-	 }
-	 * */
 	
 }
 

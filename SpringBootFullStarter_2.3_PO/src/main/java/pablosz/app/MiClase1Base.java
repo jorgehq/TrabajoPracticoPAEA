@@ -1,13 +1,16 @@
-package pablosz.test;
+package pablosz.app;
 
+import pablosz.ann.NotPersistable;
 import pablosz.ann.Persistable;
 
 public class MiClase1Base 
 {
+	@NotPersistable
 	private String attNoPersistable;
 	
 	@Persistable
 	private String attPersistable;
+	
 
 	public String getAttNoPersistable()
 	{
@@ -24,5 +27,10 @@ public class MiClase1Base
 	public void setAttPersistable(String attPersistable)
 	{
 		this.attPersistable=attPersistable;
+	}
+	@Override
+	public String toString()
+	{
+		return "MiClase1Base [attNoPersistable="+attNoPersistable+", attPersistable="+attPersistable+"]";
 	}
 }

@@ -1,5 +1,9 @@
 package pablosz.app;
+import static org.mockito.ArgumentMatchers.any;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -20,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
-import pablosz.test.MiClase1;
+import pablosz.ann.NotPersistable;
 
 
 // +---------------------------------------------------------+
@@ -65,26 +69,18 @@ public class Application implements CommandLineRunner
 		LOG.info("Todo funciona correctamente? "+(em!=null));
 
 
-		po.destroySession(7);
-		po.createSession(7,80);
-		po.mostrarTodasSesiones();
-		
+		/*
 		int number=5;
 		String nom="pablo";
-		MiClase1 mc1 = new MiClase1(1,2,3);
+		MiClase1 mc1 = new MiClase1(12,2,3);
 		mc1.setAttPersistable("x");
 		mc1.setAttNoPersistable("y");
-		po.store(7,number);
-		po.store(7,nom);
-		po.store(7,mc1);
-		MiClase1 mc2=(MiClase1)po.load(7,MiClase1.class);
+		
 
-		
-		po.mostrarTodasSesiones();
-		po.remove(7,String.class);
-		
-		po.mostrarTodasSesiones();
-		
+		System.out.println(mc1.toString());
+		po.notPersistableRemove(mc1,mc1.getClass());
+	    System.out.println(mc1.toString());
+	*/
 		/*
 		persona pe=(persona)po.load(7,persona.class);
 		System.out.println(pe.toString());
@@ -97,6 +93,6 @@ public class Application implements CommandLineRunner
 		*/
 		
 	}
-		
+
 	}
 

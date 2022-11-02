@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import pablosz.app.Application;
+import pablosz.app.MiClase1;
+import pablosz.app.MiClase1Base;
 import pablosz.app.PersistentObject;
 
 @SpringBootTest(classes=Application.class)
