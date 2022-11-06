@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -37,30 +38,84 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import pablosz.ann.NotPersistable;
+import pablosz.test.SessionListenerTest;
 
 
 
 
 @Component
-public class PersistentObject 
+public class PersistentObject
 {
-	listener lis=new listener();
+	
+	
 
 	private static Logger LOG = LoggerFactory.getLogger(Application.class);
+	private boolean hiloOn=false;
+	
 	@Autowired
 	private EntityManager em;
 	
-	
+	//Para que funciones esta implementacion se debe invocar antes un Autowired de Listener que implementa SessionListener y  modifica 
+//sus metodos sobreescribiendolos. Con los metodos modificados existira un vinculo donde no tienes que interactuar con Listener
+	//para modificar sus variables sino que la llamada de los metodos de la implementacion que se hizo un autowired
+	//haran ese trabajo.
+	@Autowired
+	private SessionListener sl;
+
 
 	
+	
+	
+	/*
+	 Falta crear una lista con la que el hilo va a trabajar controlando los tiempos con los datos de la sesion.
+	 El hilo se usa invocandolo con el nombre dentro de la clase o desde afuera con autowired po.runListener
+	 De todas las formas correra el hilo.
+	 * */
+	@Async
+	public void runListener() {
+		
+		while(true) {
+			
+				
+				System.out.println("Hola");
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch(InterruptedException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+
+		}
+	}
 	
 	
 	
 	//Funcion insert permite iniciar una nueva sesion si la sesion ya existe no se crea de nuevo.
-	public void createSession(long key,int i) {
+	//En esta se inicia el hilo y se controlara que no exista otro.
+	//Falta guardar datos en la lista de objListener como objeto;
+	public void createSession(long key,long i) {
 
-			em.persist(new sesion(key,i));	
-		
+			
+			em.persist(new sesion(key,i));
+			//sl.sessionOpened(key); comprobacion de version anterior no modifica las variables del test
+			
+			//Version nueva delego esas variables a una clase nueva que se inyecta en el test como una nueva instancia y funciona
+			System.out.println("Session "+key+" creada");
+			if(hiloOn) {
+				System.out.println("Hilo running....");
+				sl.sessionOpened(key);
+			}else {
+				System.out.println("Hilo Start");
+				hiloOn=true;
+				sl.sessionOpened(key);
+			}
+			
+			
+			
 	}
 	
 
@@ -73,7 +128,7 @@ public class PersistentObject
 		try
 		{
 			String json=om.writeValueAsString(o);
-			if(s.getObj()=="") {
+			if(s.getObj()==null) {
 				s.setObj(json);
 			}else {
 				s.setObj(s.getObj()+";"+json);
@@ -126,6 +181,7 @@ public class PersistentObject
 		
 		this.eliminarID(id);
 		LOG.info("Sesion "+id+" eliminada");
+		sl.sessionClosed(id);
 	}
 	
 	
@@ -314,6 +370,8 @@ public class PersistentObject
 	    
 	   
     }
+    
+
 		
 	
 }

@@ -48,10 +48,15 @@ public class Application implements CommandLineRunner
 	*/
     private static Logger LOG = LoggerFactory.getLogger(Application.class);
 
-    @Autowired
-	private PersistentObject po;
+    
     @Autowired
     private EntityManager em;
+   
+    @Autowired
+    private Listener p;
+    @Autowired
+    private SessionListener sl;
+  
     
     
 
@@ -69,19 +74,29 @@ public class Application implements CommandLineRunner
 		LOG.info("Todo funciona correctamente? "+(em!=null));
 
 
+		
+		
+//Tengo dos componentes diferentes el Listener implementa sessionListener y lo modifica. Por otro lado esta SessionListener Autowired
+// que llama a una instancia de esta. Esta instancia permitira al ejecutar sus metodos modificar las variables que estan en 
+// la clase Listener.
 		/*
+		System.out.println(p.getSession1Opened()+" "+p.getSession2Opened());
+		sl.sessionOpened(1);
+		sl.sessionOpened(2);
+		System.out.println(p.getSession1Opened()+" "+p.getSession2Opened());
+*/
+		
+		
+		
+	
+		/*
+		 
 		int number=5;
 		String nom="pablo";
 		MiClase1 mc1 = new MiClase1(12,2,3);
 		mc1.setAttPersistable("x");
 		mc1.setAttNoPersistable("y");
-		
-
-		System.out.println(mc1.toString());
-		po.notPersistableRemove(mc1,mc1.getClass());
-	    System.out.println(mc1.toString());
-	*/
-		/*
+		 * 
 		persona pe=(persona)po.load(7,persona.class);
 		System.out.println(pe.toString());
 		

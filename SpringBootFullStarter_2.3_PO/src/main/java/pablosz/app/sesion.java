@@ -20,7 +20,7 @@ public class sesion
 	@Column(name="id")
 	private long id;
 	@Column(name="tlimite")
-	private int tlimite;
+	private long tlimite;
 	@Column(name="obj")
 	private String obj;
 	@Column(name="lastA")
@@ -29,11 +29,11 @@ public class sesion
 	
 	public sesion() {};
 	
-	public sesion(long id,int tlimite)
+	public sesion(long id,long tlimite)
 	{
 		setId(id);
 		setTlimite( tlimite);
-		setObj("");
+		setObj(null);
 		setLast((int)System.currentTimeMillis());
 	
 	}
@@ -76,11 +76,11 @@ public class sesion
 	{
 		this.id=id;
 	}
-	public int getTlimite()
+	public long getTlimite()
 	{
 		return tlimite;
 	}
-	public void setTlimite(int tlimite)
+	public void setTlimite(long tlimite)
 	{
 		this.tlimite=tlimite;
 	}
