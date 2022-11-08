@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -39,6 +40,7 @@ import pablosz.ann.NotPersistable;
 @SpringBootApplication
 @Transactional
 @EnableAsync
+@EnableCaching(proxyTargetClass = true)
 public class Application implements CommandLineRunner
 {
 	/*
@@ -51,12 +53,15 @@ public class Application implements CommandLineRunner
     
     @Autowired
     private EntityManager em;
+   /*
    
+    @Autowired
+    private SessionListener sl;
+  */
     @Autowired
     private Listener p;
     @Autowired
-    private SessionListener sl;
-  
+    private PersistentObject po;
     
     
 
@@ -73,7 +78,9 @@ public class Application implements CommandLineRunner
 	{
 		LOG.info("Todo funciona correctamente? "+(em!=null));
 
-
+		 po.createSession(1,50);
+		 po.destroySession(1);
+		
 		
 		
 //Tengo dos componentes diferentes el Listener implementa sessionListener y lo modifica. Por otro lado esta SessionListener Autowired
@@ -90,7 +97,8 @@ public class Application implements CommandLineRunner
 		
 	
 		/*
-		 
+		 po.createSession(1,50);
+		po.destroySession(1);
 		int number=5;
 		String nom="pablo";
 		MiClase1 mc1 = new MiClase1(12,2,3);
@@ -108,6 +116,7 @@ public class Application implements CommandLineRunner
 		*/
 		
 	}
+	
 
 	}
 

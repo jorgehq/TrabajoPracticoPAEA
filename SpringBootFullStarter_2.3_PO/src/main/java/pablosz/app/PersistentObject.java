@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
+import java.lang.Runnable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -44,6 +45,7 @@ import pablosz.test.SessionListenerTest;
 
 
 @Component
+
 public class PersistentObject
 {
 	
@@ -76,23 +78,24 @@ public class PersistentObject
 		
 		while(true) {
 			
-				
-				System.out.println("Hola");
 				try
 				{
 					Thread.sleep(1000);
 				}
 				catch(InterruptedException e)
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				System.out.println("Hilo running....");
+				
 				
 
 		}
 	}
 	
 	
+    
+
 	
 	//Funcion insert permite iniciar una nueva sesion si la sesion ya existe no se crea de nuevo.
 	//En esta se inicia el hilo y se controlara que no exista otro.
@@ -110,8 +113,11 @@ public class PersistentObject
 				sl.sessionOpened(key);
 			}else {
 				System.out.println("Hilo Start");
-				hiloOn=true;
 				sl.sessionOpened(key);
+				hiloOn=true;
+				runListener();
+				
+				
 			}
 			
 			
@@ -181,7 +187,7 @@ public class PersistentObject
 		
 		this.eliminarID(id);
 		LOG.info("Sesion "+id+" eliminada");
-		sl.sessionClosed(id);
+	//	sl.sessionClosed(id);
 	}
 	
 	
@@ -370,7 +376,9 @@ public class PersistentObject
 	    
 	   
     }
-    
+
+
+
 
 		
 	

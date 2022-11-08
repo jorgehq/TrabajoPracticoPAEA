@@ -114,7 +114,8 @@ public class Listener implements SessionListener
 			case k2:
 				session2StillOpened++;
 				break;
-		}		
+		}
+		System.out.println("Still Opened "+key);
 	}
 	
 	@Override
@@ -132,7 +133,8 @@ public class Listener implements SessionListener
 			case k2:
 				session2Opened--;
 				break;
-		}		
+		}
+		System.out.println("Closed "+key);
 	}
 
 	@Override
@@ -150,7 +152,8 @@ public class Listener implements SessionListener
 			case k2:
 				session2StillOpened++;
 				break;
-		}		
+		}
+		System.out.println("Still closed "+key);
 	}
 	
 	public void esperar(long n)
@@ -181,6 +184,7 @@ public class Listener implements SessionListener
 				session2Opened++;
 				break;
 		}
+		System.out.println("Opened "+key);
 	}
 
 
