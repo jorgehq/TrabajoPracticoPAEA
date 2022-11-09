@@ -3,6 +3,8 @@ package pablosz.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import pablosz.app.Application;
 import pablosz.app.PersistentObject;
 import pablosz.app.SessionListener;
+import pablosz.app.objListener;
 
 
 @SpringBootTest(classes=Application.class)
@@ -187,6 +190,13 @@ public class OldVersionSessionListenerTest implements SessionListener
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
+		}
+
+		@Override
+		public void runListener(List<objListener> lista)
+		{
+			// TODO Auto-generated method stub
+			
 		}
 
 	}

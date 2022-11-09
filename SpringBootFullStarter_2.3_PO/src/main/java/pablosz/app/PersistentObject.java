@@ -231,7 +231,7 @@ public class PersistentObject
 			i++;
 		}
 		lista.remove(i);
-		System.out.println("Tamanio list "+lista.size());
+	
 		
 	}
 	

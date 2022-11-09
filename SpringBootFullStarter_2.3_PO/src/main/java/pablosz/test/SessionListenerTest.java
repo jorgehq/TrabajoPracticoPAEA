@@ -29,7 +29,8 @@ public class SessionListenerTest
 {
 	@Autowired
 	private PersistentObject po;
-
+	@Autowired
+	private Listener l;
 	
 	private static final long loopThread=1000;
 	
@@ -39,13 +40,12 @@ public class SessionListenerTest
 	private static final long key2 = 2;
 	private static final long timeOut2 = 10000;
 	
-	@Autowired
-	private Listener pr;
+	
 	
 	@BeforeEach
 	public void before()
 	{
-		pr.cero();
+		l.cero();
 		po.createSession(key1,timeOut1);
 		po.createSession(key2,timeOut2);
 		
@@ -57,7 +57,6 @@ public class SessionListenerTest
 	{
 		po.destroySession(key1);
 		po.destroySession(key2);
-		//po.setHiloOn(false);
 	}
 	
 	@Test
@@ -66,27 +65,28 @@ public class SessionListenerTest
 		
 		System.out.println("=================================Comienzo test 1===================================");
 		
-		System.out.println("SEssion 1 :"+pr.getSession1Opened()+" SEssion 2 :"+pr.getSession2Opened());
+		System.out.println("Primera evaluacion= SEssion 1 :"+l.getSession1Opened()+" SEssion 2 :"+l.getSession2Opened());
 		
-		assertTrue(pr.getSession1Opened()==1);
-		assertTrue(pr.getSession2Opened()==1);
+		assertTrue(l.getSession1Opened()==1);
+		assertTrue(l.getSession2Opened()==1);
 		
 		esperar(timeOut1/2);
-		System.out.println("SEssion 1 :"+pr.getSession1Opened()+" SEssion 2 :"+pr.getSession2Opened());
-		assertTrue(pr.getSession1Opened()==1);		
-		assertTrue(pr.getSession2Opened()==1);
+		System.out.println("Segunda evaluacion= SEssion 1 :"+l.getSession1Opened()+" SEssion 2 :"+l.getSession2Opened());
+		assertTrue(l.getSession1Opened()==1);		
+		assertTrue(l.getSession2Opened()==1);
 		
 		esperar((timeOut1/2)+loopThread*2);
-		System.out.println("SEssion 1 :"+pr.getSession1Opened()+" SEssion 2 :"+pr.getSession2Opened());		assertTrue(pr.getSession1Opened()==0);
-		assertTrue(pr.getSession2Opened()==1);
+		System.out.println("Tercera evaluacion= SEssion 1 :"+l.getSession1Opened()+" SEssion 2 :"+l.getSession2Opened());	
+		assertTrue(l.getSession1Opened()==0);
+		assertTrue(l.getSession2Opened()==1);
 		
 		long restaEsperar = Math.abs(timeOut1-timeOut2)+loopThread*2;
 		esperar(restaEsperar);
-		assertTrue(pr.getSession1Opened()==0);
-		assertTrue(pr.getSession2Opened()==0);
+		assertTrue(l.getSession1Opened()==0);
+		assertTrue(l.getSession2Opened()==0);
 		
-		System.out.println("SEssion 1 :"+pr.getSession1Opened()+" SEssion 2 :"+pr.getSession2Opened());
-		System.out.println("SEssion sigue abierta 1 :"+pr.getSession1StillOpened()+" SEssion sigue abierta 2 :"+pr.getSession2StillOpened());
+		System.out.println("SEssion 1 :"+l.getSession1Opened()+" SEssion 2 :"+l.getSession2Opened());
+		System.out.println("SEssion sigue abierta 1 :"+l.getSession1StillOpened()+" SEssion sigue abierta 2 :"+l.getSession2StillOpened());
 		System.out.println("==================00Termino el test 1===============================");
 	}
 	
@@ -94,40 +94,46 @@ public class SessionListenerTest
 	public void testSessionStillOpenedClosed()
 	{
 		System.out.println("=================================0Test 2=============================");
-		System.out.println("SEssion 1 :"+pr.getSession1Opened()+" SEssion 2 :"+pr.getSession2Opened());
-		System.out.println("SEssion sigue abierta 1 :"+pr.getSession1StillOpened()+" SEssion sigue abierta 2 :"+pr.getSession2StillOpened());
-		assertTrue(pr.getSession2Opened()==1);
+		System.out.println("SEssion 1 :"+l.getSession1Opened()+" SEssion 2 :"+l.getSession2Opened());
+		System.out.println("SEssion sigue abierta 1 :"+l.getSession1StillOpened()+" SEssion sigue abierta 2 :"+l.getSession2StillOpened());
+		
+		assertTrue(l.getSession2Opened()==1);
 		
 		// no deberia haberse llamado a sessionSTillOpen
 		int i=0;
-		assertTrue(pr.getSession2StillOpened()==i);
+		assertTrue(l.getSession2StillOpened()==i);
 		
 		
 		long acum = 0;
-		while( acum<timeOut2 )
+		while( acum<timeOut2)
 		{
 			// espero, aun debe estar abierta
 			
 			
 			i++;
-			System.out.println("instancias 2 still  "+i);
-			esperar(loopThread);
-			System.out.println("Sesion 2 still :"+pr.getSession2StillOpened());
-			//assertTrue(pr.getSession2StillOpened()==i); Comentado test 2 OK Descomentar test 1 OK pero no ambos
+			
+			esperar(loopThread+10);
+			
+			System.out.println("Sesion 2 todavia abierto instancia :"+l.getSession2StillOpened());
+			System.out.println("Sesion 2 instancia I "+i);
+			
+			//Esto no va a funcionar ya que las instancias de sesion todavia abierta siempre se detendra en 9 porque en la 10° vuellta
+			//se cierra la sesion, por lo el problema viene con el i++ que seguira acumulando y comparara 9==10 y rompera
+		   //assertTrue(l.getSession2StillOpened()==i);
 			
 			acum+=loopThread;
-			
+			System.out.println("Acumulador "+acum);
 			
 		}
 		
 		// expiro el tiempo, paso a closed
-		System.out.println("Expiro Sesion 2 still :"+pr.getSession2Opened());
-		assertTrue(pr.getSession2Opened()==0);
+		System.out.println("Expiro Sesion 2  :"+l.getSession2Opened());
+		assertTrue(l.getSession2Opened()==0);
 
 		// espero un loop, debe seguir en closed
 		esperar(loopThread);
-		System.out.println("Ultimo Sesion 2 still :"+pr.getSession2StillOpened());
-		assertTrue(pr.getSession2StillOpened()==i-1);
+		System.out.println("Ultimo Sesion 2 still :"+l.getSession2StillOpened());
+		assertTrue(l.getSession2StillOpened()==i-1);
 		System.out.println("==================00Termino el test 2===============================");
 
 	}	

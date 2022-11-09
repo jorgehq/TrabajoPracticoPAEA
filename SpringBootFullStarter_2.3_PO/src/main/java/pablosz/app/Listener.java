@@ -51,8 +51,8 @@ public class Listener  implements SessionListener
 				
 				for(objListener obj:lista) {
 					System.out.println("Vencimiento: "+obj.getVencimiento()+""
-							+ "Tiempo mill actual "+System.currentTimeMillis()+""
-									+ " ESta abierto?"+obj.isOpen());
+							+ " == Tiempo en mili actual: "+System.currentTimeMillis()+""
+									+ " == ESta abierto la sesion? "+obj.isOpen());
 
 					
 					if(obj.getVencimiento()<System.currentTimeMillis()&&obj.isOpen()) {
@@ -62,21 +62,14 @@ public class Listener  implements SessionListener
 					}else if(obj.isOpen()==false) {
 						sessionStillClosed(obj.getId());
 					}else {
-						System.out.println("Aumento 1");
 						sessionStillOpened(obj.getId());
-						System.out.println(session2StillOpened+" and "+session1StillOpened);
+						
 					}
 				
 					
 				}
-				if(lista.isEmpty()) {
-					System.out.println("La lista esta vacia");
-					cero();
-					return;
-				}
+				System.out.println("Sesion 2 variable Still "+session2StillOpened+" and Sesion 1 variable Still "+session1StillOpened);
 
-				
-				
 
 		}
 		
