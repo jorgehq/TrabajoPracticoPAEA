@@ -109,7 +109,7 @@ public class SessionListenerTest
 		{
 			// espero, aun debe estar abierta
 			
-			
+			assertTrue(l.getSession2StillOpened()==i);
 			i++;
 			
 			esperar(loopThread+10);
